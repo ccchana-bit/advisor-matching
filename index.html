@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSU Advisor Matching System</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1B3E;
+    --gold: #C9A94B;
+    --gold-light: #E8C97A;
+    --cream: #FAF6EF;
+    --slate: #4A5568;
+    --green: #2D6A4F;
+    --green-light: #52B788;
+    --blue-mid: #1E3A6E;
+    --shadow: 0 8px 32px rgba(13,27,62,0.13);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 15% 20%, rgba(201,169,75,0.10) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 60% at 85% 75%, rgba(30,58,110,0.5) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app-shell {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 780px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeDown 0.7s ease both;
+  }
+  .header-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 5px 18px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 30px;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+  .header h1 span { color: var(--gold-light); }
+  .header p {
+    color: rgba(255,255,255,0.55);
+    font-size: 14.5px;
+    font-weight: 300;
+  }
+
+  /* Card */
+  .card {
+    background: rgba(255,255,255,0.97);
+    border-radius: 20px;
+    padding: 32px 36px;
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+    animation: fadeUp 0.7s ease both;
+  }
+  .card:nth-child(2) { animation-delay: 0.08s; }
+  .card:nth-child(3) { animation-delay: 0.16s; }
+
+  .card-title {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title::before {
+    content: '';
+    width: 4px; height: 18px;
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-light) 100%);
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  /* Input group */
+  .input-group { margin-bottom: 18px; }
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--slate);
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    width: 18px; height: 18px;
+    pointer-events: none;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 13px 16px 13px 42px;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15px;
+    color: var(--navy);
+    background: #FAFAFA;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    outline: none;
+  }
+  input[type="text"]:focus {
+    border-color: var(--gold);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(201,169,75,0.15);
+  }
+
+  /* Dropdown hint */
+  .hint-list {
+    display: none;
+    position: absolute;
+    left: 0; right: 0;
+    top: calc(100% + 6px);
+    background: #fff;
+    border: 2px solid var(--gold-light);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(13,27,62,0.12);
+    z-index: 100;
+    overflow: hidden;
+  }
+  .hint-list.show { display: block; }
+  .hint-item {
+    padding: 11px 16px;
+    font-size: 14px;
+    color: var(--navy);
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .hint-item:last-child { border-bottom: none; }
+  .hint-item:hover { background: #FFF9ED; }
+
+  /* Button */
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, var(--navy) 0%, var(--blue-mid) 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15.5px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(13,27,62,0.25);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(201,169,75,0.18), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .btn-primary:hover::after { opacity: 1; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(13,27,62,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* Results section */
+  #ResultSection { display: none; }
+  #ResultSection.visible { display: block; }
+
+  /* Rank items */
+  .rank-item {
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: slideIn 0.5s ease both;
+  }
+  .rank-item:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(13,27,62,0.10); }
+  .rank-item:nth-child(2) { animation-delay: 0.08s; }
+  .rank-item:nth-child(3) { animation-delay: 0.16s; }
+  .rank-item:nth-child(4) { animation-delay: 0.24s; }
+
+  .rank-1 { background: linear-gradient(135deg, #FFF8E1 0%, #FFFDE7 100%); border: 2px solid #F9C846; }
+  .rank-2 { background: linear-gradient(135deg, #E3F2FD 0%, #E8F4FD 100%); border: 2px solid #64B5F6; }
+  .rank-3 { background: linear-gradient(135deg, #FFF3E0 0%, #FFF8F0 100%); border: 2px solid #FFA726; }
+
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .rank-1 .rank-badge { background: #F9C846; color: #5D4037; }
+  .rank-2 .rank-badge { background: #64B5F6; color: #0D47A1; }
+  .rank-3 .rank-badge { background: #FFA726; color: #4E342E; }
+
+  .rank-number {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .rank-1 .rank-number { background: #5D4037; color: #FFD54F; }
+  .rank-2 .rank-number { background: #0D47A1; color: #fff; }
+  .rank-3 .rank-number { background: #4E342E; color: #FFB74D; }
+
+  .advisor-name {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .advisor-reason {
+    font-size: 13.5px;
+    color: var(--slate);
+    line-height: 1.65;
+  }
+  .advisor-reason strong { color: var(--navy); font-weight: 600; }
+
+  /* Error state */
+  .error-card {
+    background: #FFF5F5;
+    border: 2px solid #FC8181;
+    border-radius: 16px;
+    padding: 20px 24px;
+    color: #C53030;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .error-card svg { flex-shrink: 0; width: 22px; height: 22px; }
+
+  /* Quick select buttons */
+  .quick-select {
+    margin-top: 14px;
+  }
+  .quick-select p {
+    font-size: 12px;
+    color: #9CA3AF;
+    margin-bottom: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .quick-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .quick-btn {
+    font-family: 'Sarabun', sans-serif;
+    font-size: 12.5px;
+    padding: 7px 14px;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 20px;
+    background: #F9FAFB;
+    color: var(--slate);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .quick-btn:hover {
+    border-color: var(--gold);
+    background: #FFF9ED;
+    color: var(--navy);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 12px;
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+    animation: fadeUp 1s 0.4s ease both;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .card { padding: 22px 18px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge">Thaksin University · Ph.D. Program</div>
+    <h1>TSU <span>Advisor</span> Matching</h1>
+    <p>ระบบแนะนำอาจารย์ที่ปรึกษาดุษฎีนิพนธ์ · หลักสูตรการพัฒนาที่ยั่งยืน</p>
+  </div>
+
+  <!-- Input Card -->
+  <div class="card">
+    <div class="card-title">ค้นหาที่ปรึกษาเหมาะสมสำหรับนิสิต</div>
+
+    <div class="input-group">
+      <label>ชื่อ-นามสกุลนิสิต</label>
+      <div class="input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="StudentNameInput" placeholder="พิมพ์ชื่อ-นามสกุลนิสิต..." autocomplete="off" />
+        <div class="hint-list" id="HintList"></div>
+      </div>
+    </div>
+
+    <div class="quick-select">
+      <p>เลือกนิสิตในระบบ</p>
+      <div class="quick-btns" id="QuickBtns"></div>
+    </div>
+
+    <div style="margin-top:22px;">
+      <button class="btn-primary" onclick="executeMatchingLogic()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        วิเคราะห์การจับคู่ที่ปรึกษา
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Card -->
+  <div class="card" id="ResultSection">
+    <div class="card-title">ผลการจับคู่อาจารย์ที่ปรึกษา (Top 3 Matches)</div>
+    <div id="ResultList"></div>
+  </div>
+
+  <div class="footer">TSU · หลักสูตรปรัชญาดุษฎีบัณฑิต สาขาการพัฒนาที่ยั่งยืน</div>
+
+</div>
+
+<script>
+// ==========================================
+// DATA & LOGIC
+// ==========================================
+const students = [
+  "นายคณิศร ตันวัฒนะ",
+  "ว่าที่พันตรีเตชนิธิ รุจิปูริตานันท์",
+  "นายนิวุฒ พูลศร",
+  "นายสุรพงษ อินทสระ",
+  "นายปณัย ไชยธาดา",
+  "นายวุติชัย สุวรรณมณี"
+];
+
+function getAdvisorMatches(name) {
+  switch(name.trim()) {
+    case "นายคณิศร ตันวัฒนะ":
+      return [
+        { rank:1, name:"ผศ.ดร.วสันต์ กาญจนมุกดา", reason:"ตรงที่สุดในมิติต้นทุนแฝง บัญชีบริหาร และการวิเคราะห์ห่วงโซ่คุณค่า (Value Chain Analysis) ของชุมชนท้องถิ่น" },
+        { rank:2, name:"ผศ.ดร.วาสนา สุวรรณวิจิตร", reason:"มีผลงานวิจัยเด่นตรงสายเรื่อง 'การพยากรณ์ปริมาณการส่งออกทุเรียนสดของไทยด้วยวิธีสถิติขั้นสูง' เหมาะเป็นที่ปรึกษาร่วมด้านโครงสร้างตลาดทุเรียน" },
+        { rank:3, name:"ผศ.ดร.อนิวัช แก้วจำนงค์", reason:"ช่วยให้คำแนะนำในด้านสมรรถนะผู้ประกอบการและการยกระดับนวัตกรรมในห่วงโซ่อุปทานกลุ่มธุรกิจการเกษตร" }
+      ];
+    case "ว่าที่พันตรีเตชนิธิ รุจิปูริตานันท์":
+      return [
+        { rank:1, name:"ผศ.ดร.ธีรพร ทองขะโชค", reason:"ตรงที่สุดด้วยคุณวุฒิด้านการจัดการ และมีผลงานวิจัยกฎหมายนโยบายเศรษฐกิจ/สังคมภายใต้หลักการพัฒนาที่ยั่งยืนโดยตรง" },
+        { rank:2, name:"ผศ.ดร.วสันต์ กาญจนมุกดา", reason:"มีความเชี่ยวชาญด้านระบบบัญชีบริหารและบัญชีนิติเวช (Forensic Accounting) เพื่อการตรวจสอบธรรมาภิบาลและความโปร่งใส" },
+        { rank:3, name:"ผศ.ดร.จิดาภา พรยิ่ง", reason:"เชี่ยวชาญข้อกฎหมายและการพัฒนามาตรการทางกฎหมายเพื่อควบคุมความเสี่ยงของสังคมและสร้างธรรมาภิบาล" }
+      ];
+    case "นายนิวุฒ พูลศร":
+      return [
+        { rank:1, name:"ผศ.ดร.วสันต์ กาญจนมุกดา", reason:"ตรงมากที่สุด มีชุดโครงการวิจัยเกี่ยวกับการจัดทำบัญชี การบริหารวิสาหกิจชุมชน และการทำบัญชีครัวเรือนตามหลักเศรษฐกิจพอเพียงในพื้นที่ภาคใต้" },
+        { rank:2, name:"รศ.ดร.สมเกียรติ สายธนู", reason:"มีผลงานวิจัยโดยตรงในการสร้างรูปแบบการพัฒนาวิสาหกิจชุมชนเพื่อยกระดับเศรษฐกิจฐานรากในพื้นที่เชิงพื้นที่และการท่องเที่ยว" },
+        { rank:3, name:"ดร. Yejin Kim", reason:"มีความเชี่ยวชาญในพื้นที่ภาคใต้ และกระบวนการวิจัยเชิงปฏิบัติการเพื่อการขับเคลื่อนชุมชนท้องถิ่น" }
+      ];
+    case "นายสุรพงษ อินทสระ":
+      return [
+        { rank:1, name:"ดร. Yejin Kim", reason:"ตรงที่สุดเนื่องจากเชี่ยวชาญพฤติกรรมศาสตร์ จิตวิทยาสังคม และมีประสบการณ์วิจัยเชิงลึกเกี่ยวกับทัศนคติ/พฤติกรรมของประชาชนในพื้นที่จังหวัดชายแดนภาคใต้" },
+        { rank:2, name:"รศ.ดร.สมเกียรติ สายธนู", reason:"เคยทำวิจัยประเมินปัจจัยทางสังคมในจังหวัดปัตตานี และเชี่ยวชาญการวิจัยเชิงพื้นที่วัฒนธรรมท้องถิ่นภาคใต้" },
+        { rank:3, name:"ผศ.ดร.วสันต์ กาญจนมุกดา", reason:"มีความรู้ด้านบัญชีนิติเวช (Forensic) ซึ่งเกี่ยวกระบวนการยุติธรรมและการสืบสวนสอบสวนพฤติกรรมความโปร่งใส" }
+      ];
+    case "นายปณัย ไชยธาดา":
+      return [
+        { rank:1, name:"รศ.ดร.สมเกียรติ สายธนู", reason:"ตรงที่สุดอย่างเป็นเอกฉันท์ มีงานวิจัยปี 2025 เรื่อง 'การประเมินคาร์บอนฟุตพริ้นท์และแนวทางการลดก๊าซเรือนกระจกในโรงงานแปรรูปอาหารทะเลแช่แข็งเพื่อมุ่งสู่ Net Zero'" },
+        { rank:2, name:"รศ.ดร.กนกพร สังขรัตน์", reason:"เชี่ยวชาญเทคโนโลยีชีวภาพเพื่อความยั่งยืน มีผลงานเด่นด้านการเปลี่ยนของเสียจากอุตสาหกรรมโรงงานให้เป็นพลังงานทางเลือกและพลาสติกชีวภาพ PHA" },
+        { rank:3, name:"รศ.ดร.สรรพสิทธิ์ กล่อมเกล้า", reason:"ตรงสายงานอุตสาหกรรมเทคโนโลยีอาหาร มีผลงานวิจัยนวัตกรรมการสกัดสารชีวภาพและการเพิ่มมูลค่าเศษของเหลือทิ้งจากกระบวนการผลิตสัตว์น้ำ" }
+      ];
+    case "นายวุติชัย สุวรรณมณี":
+      return [
+        { rank:1, name:"ผศ.ดร.วสันต์ กาญจนมุกดา", reason:"ตรงที่สุดด้านการจัดการสถาบันการเงินระดับท้องถิ่น และการประยุกต์ใช้ความรู้ทางบัญชีบริหารเพื่อบริหารจัดการกลุ่มทุนชุมชนอย่างยั่งยืน" },
+        { rank:2, name:"รศ.ดร.สมเกียรติ สายธนู", reason:"เชี่ยวชาญสูงในการขับเคลื่อนเศรษฐกิจฐานรากด้วยกระบวนการวิจัยแบบมีส่วนร่วมของชุมชน (Participatory Approach)" },
+        { rank:3, name:"ดร. Yejin Kim", reason:"มีความเชี่ยวชาญเฉพาะทางในการเขียนและสอนระเบียบวิธีวิจัยเชิงปฏิบัติการ (Action Research) สำหรับผู้ทำงานพัฒนาสังคม" }
+      ];
+    default:
+      return null;
+  }
+}
+
+// ==========================================
+// UI LOGIC
+// ==========================================
+const input = document.getElementById('StudentNameInput');
+const hintList = document.getElementById('HintList');
+const resultSection = document.getElementById('ResultSection');
+const resultList = document.getElementById('ResultList');
+
+// Quick buttons
+const quickBtns = document.getElementById('QuickBtns');
+students.forEach(name => {
+  const btn = document.createElement('button');
+  btn.className = 'quick-btn';
+  btn.textContent = name;
+  btn.onclick = () => { input.value = name; hintList.classList.remove('show'); executeMatchingLogic(); };
+  quickBtns.appendChild(btn);
+});
+
+// Autocomplete
+input.addEventListener('input', () => {
+  const val = input.value.trim();
+  const filtered = val ? students.filter(s => s.includes(val)) : [];
+  if (filtered.length && val) {
+    hintList.innerHTML = filtered.map(s =>
+      `<div class="hint-item" onclick="selectHint('${s}')">${s}</div>`
+    ).join('');
+    hintList.classList.add('show');
+  } else {
+    hintList.classList.remove('show');
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.input-wrap')) hintList.classList.remove('show');
+});
+
+function selectHint(name) {
+  input.value = name;
+  hintList.classList.remove('show');
+}
+
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') executeMatchingLogic();
+});
+
+// Rank styling config
+const rankConfig = [
+  { cls:'rank-1', badge:'🥇 อันดับ 1 · ตรงมากที่สุด', numLabel:'1' },
+  { cls:'rank-2', badge:'🥈 อันดับ 2', numLabel:'2' },
+  { cls:'rank-3', badge:'🥉 อันดับ 3', numLabel:'3' },
+];
+
+function executeMatchingLogic() {
+  const name = input.value.trim();
+  if (!name) {
+    input.focus();
+    input.style.borderColor = '#FC8181';
+    setTimeout(() => input.style.borderColor = '', 1200);
+    return;
+  }
+  hintList.classList.remove('show');
+
+  const matches = getAdvisorMatches(name);
+
+  resultSection.classList.add('visible');
+
+  if (!matches) {
+    resultList.innerHTML = `
+      <div class="error-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        <div>ไม่พบข้อมูลนิสิต <strong>"${name}"</strong> ในระบบ<br>
+        <span style="font-size:12px;opacity:0.75">กรุณาตรวจสอบการสะกดชื่อ-นามสกุล หรือเลือกจากรายการด้านบน</span></div>
+      </div>`;
+    return;
+  }
+
+  resultList.innerHTML = matches.map((m, i) => {
+    const cfg = rankConfig[i];
+    return `
+    <div class="rank-item ${cfg.cls}">
+      <div class="rank-badge">
+        <span class="rank-number">${cfg.numLabel}</span>
+        ${cfg.badge.replace(/^\S+\s/, '')}
+      </div>
+      <div class="advisor-name">${m.name}</div>
+      <div class="advisor-reason"><strong>เหตุผล:</strong> ${m.reason}</div>
+    </div>`;
+  }).join('');
+
+  resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>
