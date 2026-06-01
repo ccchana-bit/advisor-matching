@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUN-QA Progress Dashboard 3D</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0f1d;
+            --card-bg: rgba(16, 24, 48, 0.75);
+            --neon-cyan: #00f3ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffea00;
+            --neon-pink: #ff0055;
+            --text-main: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 243, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 0, 85, 0.1) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: #8a99ad;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2.5rem;
+            max-width: 1300px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        @media (max-width: 968px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--neon-cyan), transparent, var(--neon-pink));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0.4;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .layer-3d {
+            transform: translateZ(40px);
+            transition: transform 0.3s ease;
+        }
+
+        .main-progress-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 1.5rem 0;
+        }
+
+        .chart-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(50px);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .chart-center-text span {
+            display: block;
+            font-size: 0.9rem;
+            color: #8a99ad;
+            font-weight: 400;
+            text-transform: uppercase;
+            margin-top: -5px;
+        }
+
+        .criteria-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+
+        .criteria-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1.2rem;
+            border-left: 5px solid transparent;
+            transform: translateZ(20px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .c1 { border-left-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
+        .c2 { border-left-color: var(--neon-green); box-shadow: 0 0 15px rgba(57, 255, 20, 0.1); }
+        .c3 { border-left-color: var(--neon-yellow); box-shadow: 0 0 15px rgba(255, 234, 0, 0.1); }
+        .c4 { border-left-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 0, 85, 0.1); }
+
+        .criteria-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .criteria-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #fff;
+        }
+
+        .criteria-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .bg-c1 { background: rgba(0, 243, 255, 0.15); color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.3); }
+        .bg-c2 { background: rgba(57, 255, 20, 0.15); color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
+        .bg-c3 { background: rgba(255, 234, 0, 0.15); color: var(--neon-yellow); box-shadow: 0 0 10px rgba(255, 234, 0, 0.3); }
+        .bg-c4 { background: rgba(255, 0, 85, 0.15); color: var(--neon-pink); box-shadow: 0 0 10px rgba(255, 0, 85, 0.3); }
+
+        .progress-track {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            height: 10px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.1, 1, 0.1, 1);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background-image: linear-gradient(
+                -45deg, 
+                rgba(255, 255, 255, 0.2) 25%, 
+                transparent 25%, 
+                transparent 50%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.2) 75%, 
+                transparent 75%, 
+                transparent
+            );
+            background-size: 50px 50px;
+            animation: move-led 2s linear infinite;
+        }
+
+        .bar-c1 { background: linear-gradient(90deg, #0055ff, var(--neon-cyan)); box-shadow: 0 0 15px var(--neon-cyan); }
+        .bar-c2 { background: linear-gradient(90deg, #00aa50, var(--neon-green)); box-shadow: 0 0 15px var(--neon-green); }
+        .bar-c3 { background: linear-gradient(90deg, #ffaa00, var(--neon-yellow)); box-shadow: 0 0 15px var(--neon-yellow); }
+        .bar-c4 { background: linear-gradient(90deg, #aa0033, var(--neon-pink)); box-shadow: 0 0 15px var(--neon-pink); }
+
+        @keyframes move-led {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 0; }
+        }
+
+        .stats-footer {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            color: #8a99ad;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AUN-QA SAR Progress</h1>
+        <p>Self Assessment Report Monitoring Dashboard (Criteria 1 - 4)</p>
+    </header>
+
+    <div class="dashboard-container">
+        
+        <div class="card main-progress-card" id="card1">
+            <div class="layer-3d">
+                <h2 style="color: #fff; font-size: 1.4rem; font-weight: 700; letter-spacing: 1px;">OVERALL PROGRESS</h2>
+                
+                <div class="chart-container">
+                    <canvas id="overallChart"></canvas>
+                    <div class="chart-center-text">
+                        64%
+                        <span>Completed</span>
+                    </div>
+                </div>
+
+                <p style="color: #8a99ad; font-size: 0.95rem; margin-top: 0.5rem;">
+                    ดำเนินการแล้ว <span style="color: var(--neon-cyan); font-weight: bold;">16</span> จากทั้งหมด <span style="color: #fff; font-weight: bold;">25</span> งานย่อย
+                </p>
+            </div>
+        </div>
+
+        <div class="card criteria-card" id="card2">
+            <div class="layer-3d">
+                
+                <div class="criteria-item c1">
+                    <div class="criteria-header">
+                        <div class="criteria-title">Criteria 1: Expected Learning Outcomes</div>
+                        <div class="criteria-badge bg-c1">100% Complete</div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar bar-c1" data-progress="100%"></div>
+                    </div>
+                    <div class="stats-footer">
+                        <span>สถานะ: เสร็จสิ้น</span>
+                        <span>5 / 5 งาน</span>
+                    </div>
+                </div>
+
+                <div class="criteria-item c2">
+                    <div class="criteria-header">
+                        <div class="criteria-title">Criteria 2: Program Structure and Content</div>
+                        <div class="criteria-badge bg-c2">100% Complete</div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar bar-c2" data-progress="100%"></div>
+                    </div>
+                    <div class="stats-footer">
+                        <span>สถานะ: เสร็จสิ้น</span>
+                        <span>7 / 7 งาน</span>
+                    </div>
+                </div>
+
+                <div class="criteria-item c3">
+                    <div class="criteria-header">
+                        <div class="criteria-title">Criteria 3: Teaching and Learning Approach</div>
+                        <div class="criteria-badge bg-c3">66.7% In Progress</div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar bar-c3" data-progress="66.7%"></div>
+                    </div>
+                    <div class="stats-footer">
+                        <span>สถานะ: กำลังดำเนินการ</span>
+                        <span>4 / 6 งาน</span>
+                    </div>
+                </div>
+
+                <div class="criteria-item c4">
+                    <div class="criteria-header">
+                        <div class="criteria-title">Criteria 4: Student Assessment</div>
+                        <div class="criteria-badge bg-c4">0% Not Started</div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar bar-c4" data-progress="0%"></div>
+                    </div>
+                    <div class="stats-footer">
+                        <span>สถานะ: ยังไม่เริ่มดำเนินการ</span>
+                        <span>0 / 7 งาน</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const bars = document.querySelectorAll('.progress-bar');
+                bars.forEach(bar => {
+                    bar.style.width = bar.getAttribute('data-progress');
+                });
+            }, 300);
+        });
+
+        const ctx = document.getElementById('overallChart').getContext('2d');
+        
+        const neonGradient = ctx.createLinearGradient(0, 0, 0, 300);
+        neonGradient.addColorStop(0, '#00f3ff');
+        neonGradient.addColorStop(1, '#ff0055');
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['เสร็จสิ้น (Completed)', 'คงเหลือ (Remaining)'],
+                datasets: [{
+                    data: [16, 9],
+                    backgroundColor: [neonGradient, 'rgba(255, 255, 255, 0.05)'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '83%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.label}: ${context.raw} งาน`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const cards = document.querySelectorAll('.card');
+
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const cardRect = card.getBoundingClientRect();
+                const cardWidth = cardRect.width;
+                const cardHeight = cardRect.height;
+                
+                const mouseX = e.clientX - cardRect.left - cardWidth / 2;
+                const mouseY = e.clientY - cardRect.top - cardHeight / 2;
+                
+                const rotateX = -(mouseY / cardHeight) * 25;
+                const rotateY = (mouseX / cardWidth) * 25;
+                
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                card.style.boxShadow = `${-rotateY * 1.5}px ${rotateX * 1.5}px 30px rgba(0, 243, 255, 0.2), 0 20px 45px rgba(0,0,0,0.6)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+                card.style.boxShadow = '0 20px 40px rgba(0,0,0,0.5)';
+                card.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
+            });
+
+            card.addEventListener('mouseenter', () => {
+                card.style.transition = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
