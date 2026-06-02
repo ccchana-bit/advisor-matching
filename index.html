@@ -3,24 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TSU Advisor Matching - NextGen 3D Portal</title>
+<title>TSU Advisor Matching</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-navy: #040814;
-    --panel-bg: rgba(6, 12, 32, 0.75);
+    --panel-bg: rgba(6,12,32,0.85);
     --neon-cyan: #00f3ff;
     --neon-pink: #ff007f;
     --star-gold: #ffdf00;
-    --star-gold-low: rgba(255, 223, 0, 0.15);
-    --text-glow: 0 0 10px rgba(0, 243, 255, 0.6);
-    --gold-glow: 0 0 15px rgba(255, 223, 0, 0.5);
-    --border-glass: rgba(0, 243, 255, 0.2);
-    --shadow-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    --border-glass: rgba(0,243,255,0.2);
+    --shadow-3d: 0 25px 50px -12px rgba(0,0,0,0.7);
+    --text-glow: 0 0 10px rgba(0,243,255,0.6);
+    --cyber-glow: 0 0 15px rgba(255,223,0,0.5);
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'Sarabun', sans-serif;
     background-color: var(--bg-navy);
@@ -28,32 +25,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 30px 15px;
+    justify-content: flex-start;
+    padding: 30px 15px 50px;
     overflow-x: hidden;
-    perspective: 1000px;
   }
-
-  /* Harmonic Star Dust Canvas Background */
   #starfieldCanvas {
-    position: fixed;
-    top: 0; left: 0;
+    position: fixed; top: 0; left: 0;
     width: 100%; height: 100%;
-    z-index: 0;
-    pointer-events: none;
+    z-index: 0; pointer-events: none;
   }
-
   .cyber-container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 820px;
-    transform-style: preserve-3d;
-    transform: rotateX(2deg);
+    position: relative; z-index: 1;
+    width: 100%; max-width: 820px;
     animation: floatingPortal 6s ease-in-out infinite alternate;
   }
-
-  /* 3D Glassmorphic App Shell */
   .app-shell {
     background: var(--panel-bg);
     backdrop-filter: blur(25px);
@@ -61,298 +46,163 @@
     border: 1px solid var(--border-glass);
     border-radius: 24px;
     padding: 40px;
-    box-shadow: var(--shadow-3d), 
-                inset 0 0 20px rgba(0, 243, 255, 0.1),
-                0 0 40px rgba(255, 0, 127, 0.1);
-    position: relative;
-    overflow: hidden;
+    box-shadow: var(--shadow-3d), inset 0 0 20px rgba(0,243,255,0.08), 0 0 40px rgba(255,0,127,0.08);
+    position: relative; overflow: hidden;
   }
-
   .app-shell::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -50%;
-    width: 200%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.05), transparent);
+    content: ''; position: absolute;
+    top: 0; left: -50%; width: 200%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,243,255,0.04), transparent);
     transform: skewX(-30deg);
     animation: laserSweep 8s linear infinite;
   }
-
-  /* Cyber Header */
-  .cyber-header {
-    text-align: center;
-    margin-bottom: 40px;
-  }
+  .cyber-header { text-align: center; margin-bottom: 40px; }
   .hud-badge {
     display: inline-block;
     font-family: 'Orbitron', sans-serif;
     background: linear-gradient(135deg, var(--neon-pink) 0%, #9900ff 100%);
-    color: #fff;
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 3px;
-    padding: 6px 20px;
-    border-radius: 30px;
-    margin-bottom: 15px;
-    box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+    color: #fff; font-weight: 700; font-size: 11px;
+    letter-spacing: 3px; padding: 6px 20px; border-radius: 30px;
+    margin-bottom: 15px; box-shadow: 0 0 15px rgba(255,0,127,0.4);
     text-transform: uppercase;
   }
   .cyber-header h1 {
     font-family: 'Orbitron', 'Sarabun', sans-serif;
-    font-size: 34px;
-    color: #fff;
-    font-weight: 900;
-    line-height: 1.2;
-    letter-spacing: 1px;
-    text-shadow: var(--text-glow);
-    margin-bottom: 10px;
+    font-size: 34px; color: #fff; font-weight: 900;
+    line-height: 1.2; letter-spacing: 1px;
+    text-shadow: var(--text-glow); margin-bottom: 10px;
   }
   .cyber-header h1 span {
-    color: var(--neon-cyan);
     background: linear-gradient(to right, #00f3ff, #00ffaa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .cyber-header p {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 14.5px;
-    letter-spacing: 0.5px;
-  }
-
-  /* 3D Glass Inputs */
-  .hud-group {
-    margin-bottom: 30px;
-    position: relative;
-  }
+  .cyber-header p { color: rgba(255,255,255,0.6); font-size: 14.5px; letter-spacing: 0.5px; }
+  .hud-group { margin-bottom: 30px; position: relative; }
   .hud-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--neon-cyan);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    text-shadow: 0 0 5px rgba(0, 243, 255, 0.4);
+    display: block; font-size: 13px; font-weight: 700;
+    color: var(--neon-cyan); margin-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    text-shadow: 0 0 5px rgba(0,243,255,0.4);
   }
   .search-wrapper { position: relative; }
   .search-wrapper svg {
-    position: absolute;
-    left: 16px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--neon-cyan);
-    width: 20px; height: 20px;
-    filter: drop-shadow(var(--text-glow));
+    position: absolute; left: 16px; top: 50%;
+    transform: translateY(-50%); color: var(--neon-cyan);
+    width: 20px; height: 20px; filter: drop-shadow(0 0 4px rgba(0,243,255,0.6));
   }
-  
   .cyber-input {
-    width: 100%;
-    padding: 16px 16px 16px 52px;
-    background: rgba(4, 10, 30, 0.8);
-    border: 1px solid rgba(0, 243, 255, 0.3);
-    border-radius: 14px;
-    font-family: 'Sarabun', sans-serif;
-    font-size: 16px;
-    color: #fff;
-    text-shadow: 0 0 2px #fff;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    outline: none;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+    width: 100%; padding: 16px 16px 16px 52px;
+    background: rgba(4,10,30,0.8);
+    border: 1px solid rgba(0,243,255,0.3);
+    border-radius: 14px; font-family: 'Sarabun', sans-serif;
+    font-size: 16px; color: #fff; transition: all 0.3s ease;
+    outline: none; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
   }
   .cyber-input:focus {
     border-color: var(--neon-cyan);
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.3), inset 0 2px 5px rgba(0,0,0,0.2);
-    background: rgba(6, 15, 45, 0.9);
+    box-shadow: 0 0 20px rgba(0,243,255,0.3), inset 0 2px 5px rgba(0,0,0,0.2);
+    background: rgba(6,15,45,0.9);
   }
-
-  /* Hologram Match Dropdown Suggestions */
   .hologram-hints {
-    display: none;
-    position: absolute;
-    left: 0; right: 0;
+    display: none; position: absolute; left: 0; right: 0;
     top: calc(100% + 8px);
-    background: rgba(5, 12, 36, 0.95);
-    border: 1px solid var(--neon-cyan);
-    border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 15px rgba(0, 243, 255, 0.2);
-    z-index: 100;
-    max-height: 290px;
-    overflow-y: auto;
+    background: rgba(5,12,36,0.97);
+    border: 1px solid var(--neon-cyan); border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 15px rgba(0,243,255,0.2);
+    z-index: 100; max-height: 290px; overflow-y: auto;
     backdrop-filter: blur(15px);
   }
   .hologram-hints.active { display: block; }
   .hint-row {
-    padding: 14px 20px;
-    cursor: pointer;
+    padding: 14px 20px; cursor: pointer;
     transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+    border-bottom: 1px solid rgba(0,243,255,0.1);
   }
   .hint-row:last-child { border-bottom: none; }
-  .hint-row:hover {
-    background: linear-gradient(90deg, rgba(0, 243, 255, 0.15), transparent);
-    padding-left: 25px;
-  }
-  .hint-row .meta-id {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 11px;
-    color: var(--neon-pink);
-    font-weight: 700;
-    margin-bottom: 2px;
-  }
+  .hint-row:hover { background: linear-gradient(90deg, rgba(0,243,255,0.15), transparent); padding-left: 25px; }
+  .hint-row .meta-id { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--neon-pink); font-weight: 700; margin-bottom: 2px; }
   .hint-row .meta-name { font-size: 15px; color: #fff; font-weight: 600; }
-
-  /* Futuristic Interactive Buttons */
   .cyber-btn {
-    width: 100%;
-    padding: 16px;
+    width: 100%; padding: 16px;
     background: linear-gradient(90deg, #0066ff 0%, #00f3ff 100%);
-    color: #fff;
-    border: none;
-    border-radius: 14px;
-    font-family: 'Sarabun', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
+    color: #fff; border: none; border-radius: 14px;
+    font-family: 'Sarabun', sans-serif; font-size: 16px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
     transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0,102,255,0.4);
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
-  .cyber-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(0, 243, 255, 0.7);
-    letter-spacing: 1.5px;
-  }
+  .cyber-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0,243,255,0.7); letter-spacing: 1.5px; }
   .cyber-btn:active { transform: translateY(0); }
-
   .dashboard-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 14px;
-    background: rgba(255, 0, 127, 0.05);
-    color: #fff;
-    text-decoration: none;
-    border: 1px dashed var(--neon-pink);
-    border-radius: 14px;
-    font-size: 14.5px;
-    font-weight: 600;
-    margin-top: 15px;
-    transition: all 0.3s ease;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 14px;
+    background: rgba(255,0,127,0.05); color: #fff; text-decoration: none;
+    border: 1px dashed var(--neon-pink); border-radius: 14px;
+    font-size: 14.5px; font-weight: 600; margin-top: 15px; transition: all 0.3s ease;
   }
   .dashboard-link:hover {
     background: linear-gradient(90deg, var(--neon-pink) 0%, #9900ff 100%);
-    box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
-    border-style: solid;
-    border-color: transparent;
+    box-shadow: 0 0 20px rgba(255,0,127,0.5);
+    border-style: solid; border-color: transparent;
   }
-
-  /* Display Panel 3D Engine */
   .display-panel { display: none; margin-top: 30px; }
-  .display-panel.active { display: block; animation: panelDeploy 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
-
-  .hud-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-    margin: 25px 0;
-  }
-
-  /* 3D Core Profile Box */
+  .display-panel.active { display: block; animation: panelDeploy 0.6s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+  .hud-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); margin: 25px 0; }
   .profile-core {
-    background: rgba(0, 243, 255, 0.04);
-    border: 1px solid rgba(0, 243, 255, 0.2);
+    background: rgba(0,243,255,0.04);
+    border: 1px solid rgba(0,243,255,0.2);
     border-left: 5px solid var(--neon-cyan);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
-    position: relative;
+    border-radius: 12px; padding: 20px; margin-bottom: 25px;
   }
   .p-id { font-family: 'Orbitron', sans-serif; font-size: 12px; color: var(--neon-pink); font-weight: bold; }
   .p-name { font-size: 20px; font-weight: 700; color: #fff; margin: 4px 0 10px 0; text-shadow: var(--text-glow); }
   .p-topic { font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.6; }
-
-  /* 3D Futuristic Matrix Result Nodes */
   .node-card {
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 18px;
-    position: relative;
-    transition: all 0.3s ease;
-    background: rgba(10, 20, 50, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px; padding: 24px; margin-bottom: 18px;
+    position: relative; transition: all 0.3s ease;
+    background: rgba(10,20,50,0.6);
+    border: 1px solid rgba(255,255,255,0.08);
   }
-  .node-card:hover {
-    transform: scale(1.02) translateZ(10px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-  }
-
+  .node-card:hover { transform: scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
   .node-rank1 { border: 1px solid var(--star-gold); background: linear-gradient(145deg, rgba(255,223,0,0.06) 0%, rgba(4,8,20,0.8) 100%); box-shadow: 0 0 15px rgba(255,223,0,0.1); }
   .node-rank2 { border: 1px solid var(--neon-cyan); background: linear-gradient(145deg, rgba(0,243,255,0.05) 0%, rgba(4,8,20,0.8) 100%); }
   .node-rank3 { border: 1px solid #9900ff; background: linear-gradient(145deg, rgba(153,0,255,0.06) 0%, rgba(4,8,20,0.8) 100%); }
-
   .node-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 5px 14px;
-    border-radius: 20px;
-    margin-bottom: 15px;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; padding: 5px 14px;
+    border-radius: 20px; margin-bottom: 15px;
   }
   .node-rank1 .node-badge { background: var(--star-gold); color: #000; box-shadow: var(--cyber-glow); }
   .node-rank2 .node-badge { background: var(--neon-cyan); color: #000; }
   .node-rank3 .node-badge { background: #9900ff; color: #fff; }
-
   .adv-name { font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 8px; }
-  .adv-reason { font-size: 14px; color: rgba(255, 255, 255, 0.75); line-height: 1.6; }
+  .adv-reason { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; }
   .adv-reason span { color: var(--neon-cyan); font-weight: 600; }
-
-  /* Hologram Error Response */
   .hud-error {
-    background: rgba(255, 0, 127, 0.08);
-    border: 1px solid var(--neon-pink);
-    border-radius: 14px;
-    padding: 20px;
-    color: #fff;
-    font-size: 14.5px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+    background: rgba(255,0,127,0.08);
+    border: 1px solid var(--neon-pink); border-radius: 14px;
+    padding: 20px; color: #fff; font-size: 14.5px;
+    display: flex; align-items: center; gap: 15px;
+    box-shadow: 0 0 15px rgba(255,0,127,0.2);
   }
   .hud-error svg { color: var(--neon-pink); flex-shrink: 0; width: 26px; height: 26px; }
-
-  /* Bottom Metadata HUD */
   .cyber-footer {
-    text-align: center;
-    margin-top: 20px;
-    color: rgba(255, 255, 255, 0.25);
-    font-size: 12px;
-    font-family: 'Orbitron', 'Sarabun', sans-serif;
-    letter-spacing: 1px;
+    text-align: center; margin-top: 20px;
+    color: rgba(255,255,255,0.25); font-size: 12px;
+    font-family: 'Orbitron', 'Sarabun', sans-serif; letter-spacing: 1px;
   }
-
-  /* Matrix Structural Animations */
   @keyframes floatingPortal {
-    0% { transform: translateY(0) rotateX(2deg) rotateY(-0.5deg); }
-    100% { transform: translateY(-10px) rotateX(4deg) rotateY(0.5deg); }
+    0% { transform: translateY(0) rotateX(1deg); }
+    100% { transform: translateY(-8px) rotateX(2deg); }
   }
-  @keyframes laserSweep {
-    0% { left: -100%; } 100% { left: 100%; }
-  }
+  @keyframes laserSweep { 0% { left: -100%; } 100% { left: 100%; } }
   @keyframes panelDeploy {
     from { opacity: 0; transform: translateY(30px) scale(0.95); }
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
-
   @media (max-width: 600px) {
     .app-shell { padding: 25px 20px; }
     .cyber-header h1 { font-size: 24px; }
@@ -360,57 +210,44 @@
 </style>
 </head>
 <body>
-
 <canvas id="starfieldCanvas"></canvas>
-
 <div class="cyber-container">
   <div class="app-shell">
-
     <div class="cyber-header">
       <div class="hud-badge">TSU Intelligent Core</div>
       <h1>Advisor <span>Matching</span> System</h1>
       <p>ระบบแมตช์ที่ปรึกษาตามมิติความเชี่ยวชาญหลักสูตรปรับปรุง พ.ศ. 2568</p>
     </div>
-
     <div class="hud-group">
       <label>กรอกข้อมูลชื่อ-นามสกุล หรือ รหัสนิสิตดุษฎีบัณฑิต</label>
       <div class="search-wrapper">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input type="text" id="QuantumSearch" class="cyber-input" placeholder="พิมพ์เพื่อค้นหา เช่น คณิศร หรือ 6819980002..." Lauren autocomplete="off" />
+        <input type="text" id="QuantumSearch" class="cyber-input" placeholder="พิมพ์เพื่อค้นหา เช่น คณิศร หรือ 6819980002..." autocomplete="off" />
         <div id="HintDropdown" class="hologram-hints"></div>
       </div>
     </div>
-
     <button class="cyber-btn" onclick="triggerQuantumMatch()">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
       </svg>
       วิเคราะห์ระบบจัดสรรคณาจารย์
     </button>
-
     <a href="aun_qa_sar_progress_dashboard.html" class="dashboard-link">
       <span>📊 โอนย้ายข้อมูลไปยังหน้า AUN-QA Progress Dashboard</span>
     </a>
-
     <div class="hud-divider"></div>
-
     <div id="DisplayPanel" class="display-panel">
       <div id="DynamicResultTarget"></div>
     </div>
-
   </div>
   <div class="cyber-footer">SECURITY COMPLIANCE STATUS: CHECO-2026-ACTIVE // TOTAL CORE 12 RECORDS</div>
 </div>
 
 <script>
-// =========================================================================
-// CANVAS ENGINE: STAR DUST PARTICLES FUZZY IN HARMONIC OSCILLATIONS WAVE
-// =========================================================================
 const canvas = document.getElementById('starfieldCanvas');
 const ctx = canvas.getContext('2d');
-
 let dots = [];
 const maxDots = 85;
 let harmonicTime = 0;
@@ -422,7 +259,6 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Instantiation of Star Dust Entities
 for (let i = 0; i < maxDots; i++) {
   dots.push({
     x: Math.random() * window.innerWidth,
@@ -439,34 +275,20 @@ for (let i = 0; i < maxDots; i++) {
 function renderHarmonicWaves() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   harmonicTime += 0.015;
-
   dots.forEach(dot => {
     dot.y -= dot.speedY;
-    if (dot.y < -10) {
-      dot.y = canvas.height + 10;
-      dot.x = Math.random() * canvas.width;
-    }
-
-    // Harmonic Wave function calculation for Star Dust particles lateral shift
+    if (dot.y < -10) { dot.y = canvas.height + 10; dot.x = Math.random() * canvas.width; }
     let lateralWave = Math.sin(harmonicTime * dot.frequency * 10 + dot.phase) * dot.amplitude * 0.05;
     let actualX = dot.x + lateralWave * Math.cos(dot.phase);
-
     ctx.beginPath();
     ctx.arc(actualX, dot.y, dot.size, 0, Math.PI * 2);
-    // Deep Golden Dust Particle Emissive Glow
     ctx.fillStyle = `rgba(255, 223, 0, ${dot.brightness * (0.3 + 0.4 * Math.sin(harmonicTime + dot.phase))})`;
     ctx.fill();
   });
-
   requestAnimationFrame(renderHarmonicWaves);
 }
 renderHarmonicWaves();
 
-
-// =========================================================================
-// COMPREHENSIVE DATA ENGINE BACKED BY TSU CHECO DATA ARCHITECTURE
-// =========================================================================
-// ลำดับการแมตช์จัดเรียงจากประวัติอาจารย์ประจำหลักสูตร พ.ศ. 2568 เป็นลำดับแรก
 const database = [
   {
     id: "6819980002",
@@ -509,7 +331,7 @@ const database = [
     ]
   },
   {
-    id: "6819980006",
+    id: "6819980007",
     name: "นายปณัย ไชยธาดา",
     topic: "การพัฒนาแนวทางการลดการปล่อยก๊าซเรือนกระจกเพื่อบรรลุเป้าหมาย Net Zero Carbon ของโรงงานผลิตอาหารสัตว์เลี้ยงแปรรูปอาหารทะเลบรรจุภาชนะปิดผนึก",
     matches: [
@@ -534,7 +356,7 @@ const database = [
     topic: "The impact of Volunteerism on leadership Development among Higher Education Students in Southern Thailand",
     matches: [
       { rank: 1, name: "อาจารย์ ดร. Yejin Kim", reason: "TSU Full-time Core Advisor. Specializes in social development, behavioral sciences, and youth-led human capital progression within Southern Thailand." },
-      { rank: 2, name: "ผู้ช่วยศาสตราจารย์ ดร.ทีรพร ทองขะโชค", reason: "TSU Regular Faculty. Extensive background in strategic management and human resource leadership configurations." },
+      { rank: 2, name: "ผู้ช่วยศาสตราจารย์ ดร.ธีรพร ทองขะโชค", reason: "TSU Regular Faculty. Extensive background in strategic management and human resource leadership configurations." },
       { rank: 3, name: "รองศาสตราจารย์ ดร.สมเกียรติ สายธนู", reason: "Expert in participatory framework methodologies and localized community networks regarding student-driven social innovations." }
     ]
   },
@@ -565,7 +387,7 @@ const database = [
     matches: [
       { rank: 1, name: "อาจารย์ ดร. Yejin Kim", reason: "TSU International Core. Master in comparative socio-political studies, behavioral adjustment, and youth community networking models across Southeast Asia." },
       { rank: 2, name: "รองศาสตราจารย์ ดร.สมเกียรติ สายธนู", reason: "Familiar with Songkhla's geopolitical layout and localized civil society conflict mitigation frameworks." },
-      { rank: 3, name: "ผู้ช่วยศาสตราจารย์ ดร.ทีรพร ทองขะโชค", reason: "Provides structural guidance regarding sustainable public policies and institutional conflict management designs." }
+      { rank: 3, name: "ผู้ช่วยศาสตราจารย์ ดร.ธีรพร ทองขะโชค", reason: "Provides structural guidance regarding sustainable public policies and institutional conflict management designs." }
     ]
   },
   {
@@ -583,36 +405,25 @@ const database = [
     name: "Henry II Esteva Leman",
     topic: "Educational management, sustainable language education, Filipino teachers in Thailand, career sustainability",
     matches: [
-      { rank: 1, name: "ผู้ช่วยศาสตราจารย์ ดร.ทีรพร ทองขะโชค", reason: "TSU Core Academic. Highly focused on career trajectory sustainability, human resource planning, and professional management models in education." },
+      { rank: 1, name: "ผู้ช่วยศาสตราจารย์ ดร.ธีรพร ทองขะโชค", reason: "TSU Core Academic. Highly focused on career trajectory sustainability, human resource planning, and professional management models in education." },
       { rank: 2, name: "อาจารย์ ดร. Yejin Kim", reason: "Expert in international education environments, professional adaptation, and cross-cultural qualitative metrics." },
       { rank: 3, name: "ผู้ช่วยศาสตราจารย์ ดร.อนิวัช แก้วจำนงค์", reason: "Provides systemic evaluation regarding labor competency models and institutional sustainability indices." }
     ]
   }
 ];
 
-// =========================================================================
-// INTERACTIVE HOLOGRAM UI CONTROLLER
-// =========================================================================
 const searchInput = document.getElementById('QuantumSearch');
 const dropDown = document.getElementById('HintDropdown');
 const panel = document.getElementById('DisplayPanel');
 const target = document.getElementById('DynamicResultTarget');
 
-// Autocomplete filter tracking matching names & IDs
 searchInput.addEventListener('input', () => {
   const query = searchInput.value.trim().toLowerCase();
-  if (!query) {
-    dropDown.classList.remove('active');
-    return;
-  }
-
-  const matches = database.filter(s => 
-    s.name.toLowerCase().includes(query) || s.id.includes(query)
-  );
-
+  if (!query) { dropDown.classList.remove('active'); return; }
+  const matches = database.filter(s => s.name.toLowerCase().includes(query) || s.id.includes(query));
   if (matches.length) {
     dropDown.innerHTML = matches.map(s => `
-      <div class="hint-row" onclick="commitSelection('${s.name}')">
+      <div class="hint-row" onclick="commitSelection('${s.name.replace(/'/g,"\\'")}')">
         <div class="meta-id">SYS_ID // ${s.id}</div>
         <div class="meta-name">${s.name}</div>
       </div>
@@ -623,11 +434,8 @@ searchInput.addEventListener('input', () => {
   }
 });
 
-// Close dropdown on external clicks
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.search-wrapper')) {
-    dropDown.classList.remove('active');
-  }
+  if (!e.target.closest('.search-wrapper')) dropDown.classList.remove('active');
 });
 
 function commitSelection(name) {
@@ -636,9 +444,7 @@ function commitSelection(name) {
   triggerQuantumMatch();
 }
 
-searchInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') triggerQuantumMatch();
-});
+searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') triggerQuantumMatch(); });
 
 function triggerQuantumMatch() {
   const val = searchInput.value.trim().toLowerCase();
@@ -649,16 +455,15 @@ function triggerQuantumMatch() {
     return;
   }
   dropDown.classList.remove('active');
-
-  // Query engine locating dataset
-  const targetStudent = database.find(s => 
+  const targetStudent = database.find(s =>
     s.name.toLowerCase() === val ||
-    s.name.replace(/\s+/g, '').toLowerCase() === val.replace(/\s+/g, '') ||
-    s.id === val
+    s.name.replace(/\s+/g,'').toLowerCase() === val.replace(/\s+/g,'') ||
+    s.id === val ||
+    s.id === searchInput.value.trim()
   );
-
+  panel.classList.remove('active');
+  void panel.offsetWidth;
   panel.classList.add('active');
-
   if (!targetStudent) {
     target.innerHTML = `
       <div class="hud-error">
@@ -667,25 +472,21 @@ function triggerQuantumMatch() {
         </svg>
         <div>
           <strong>ERROR // IDENTITY_NOT_FOUND</strong><br>
-          <span style="opacity:0.75; font-size:12.5px;">ไม่พบข้อมูลนิสิตหรือรหัสระบุตัวตน "${searchInput.value}" ในฐานระบบคอร์โปรแกรม มติสัดส่วนภาคใต้ถูกระงับเนื่องจากไร้พิกัดเป้าหมาย</span>
+          <span style="opacity:0.75; font-size:12.5px;">ไม่พบข้อมูลนิสิตหรือรหัสระบุตัวตน "${searchInput.value}" ในฐานระบบคอร์โปรแกรม</span>
         </div>
       </div>`;
     return;
   }
-
-  // Render Core Profile with top matches structured inside 3D nodes
+  const nodeStyles = ['node-rank1','node-rank2','node-rank3'];
+  const medals = ['🥇 CORE ADVISOR','🥈 OPTIONAL CO-ADVISOR','🥉 ASSOCIATE NODE'];
   let output = `
     <div class="profile-core">
       <div class="p-id">DATA RECORD // NO. ${targetStudent.id}</div>
       <div class="p-name">${targetStudent.name}</div>
       <div class="p-topic"><strong>หัวข้อวิทยานิพนธ์:</strong> ${targetStudent.topic}</div>
     </div>
-    <div style="font-size:12px; font-weight:700; color:var(--neon-cyan); letter-spacing:1px; margin-bottom:15px; text-transform:uppercase;">>>> TOP 3 EXPERT ACADEMIC MATCHES DEPLOYED:</div>
+    <div style="font-size:12px; font-weight:700; color:var(--neon-cyan); letter-spacing:1px; margin-bottom:15px; text-transform:uppercase;">&gt;&gt;&gt; TOP 3 EXPERT ACADEMIC MATCHES DEPLOYED:</div>
   `;
-
-  const nodeStyles = ['node-rank1', 'node-rank2', 'node-rank3'];
-  const medals = ['🥇 CORE ADVISOR', '🥈 OPTIONAL CO-ADVISOR', '🥉 ASSOCIATE NODE'];
-
   output += targetStudent.matches.map((m, idx) => `
     <div class="node-card ${nodeStyles[idx]}">
       <div class="node-badge">${medals[idx]}</div>
@@ -693,7 +494,6 @@ function triggerQuantumMatch() {
       <div class="adv-reason"><span>เกณฑ์พิจารณาเชิงวิชาการ:</span> ${m.reason}</div>
     </div>
   `).join('');
-
   target.innerHTML = output;
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
