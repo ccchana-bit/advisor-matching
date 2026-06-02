@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AUN-QA Progress Dashboard 3D</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-color: #0a0f1d;
@@ -59,13 +59,14 @@
             letter-spacing: 1px;
         }
 
+        /* Dashboard Layout */
         .dashboard-container {
             display: grid;
             grid-template-columns: 1fr 1.5fr;
             gap: 2.5rem;
             max-width: 1300px;
             width: 100%;
-            perspective: 1000px;
+            perspective: 1000px; /* เปิดมิติ 3D สำหรับ Container */
         }
 
         @media (max-width: 968px) {
@@ -74,6 +75,7 @@
             }
         }
 
+        /* 3D Glassmorphism Card Style */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -87,6 +89,7 @@
             position: relative;
         }
 
+        /* กราฟิกแสง LED เรืองแสงรอบการ์ดเมื่อ Hover */
         .card::before {
             content: '';
             position: absolute;
@@ -106,11 +109,13 @@
             opacity: 1;
         }
 
+        /* Active Layer (ดันเนื้อหาให้ลอยขึ้นเป็นมิติ 3D) */
         .layer-3d {
             transform: translateZ(40px);
             transition: transform 0.3s ease;
         }
 
+        /* ฝั่งซ้าย: ผังวงกลมร้อยละรวม */
         .main-progress-card {
             display: flex;
             flex-direction: column;
@@ -146,6 +151,7 @@
             margin-top: -5px;
         }
 
+        /* ฝั่งขวา: รายละเอียดราย Criteria */
         .criteria-card {
             display: flex;
             flex-direction: column;
@@ -161,6 +167,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
+        /* สีไฟ LED แยกตามสถานะงาน */
         .c1 { border-left-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
         .c2 { border-left-color: var(--neon-green); box-shadow: 0 0 15px rgba(57, 255, 20, 0.1); }
         .c3 { border-left-color: var(--neon-yellow); box-shadow: 0 0 15px rgba(255, 234, 0, 0.1); }
@@ -192,6 +199,7 @@
         .bg-c3 { background: rgba(255, 234, 0, 0.15); color: var(--neon-yellow); box-shadow: 0 0 10px rgba(255, 234, 0, 0.3); }
         .bg-c4 { background: rgba(255, 0, 85, 0.15); color: var(--neon-pink); box-shadow: 0 0 10px rgba(255, 0, 85, 0.3); }
 
+        /* แถบความก้าวหน้าย่อย LED Progress Bar */
         .progress-track {
             background: rgba(255, 255, 255, 0.08);
             border-radius: 10px;
@@ -204,11 +212,12 @@
         .progress-bar {
             height: 100%;
             border-radius: 10px;
-            width: 0%;
+            width: 0%; /* ขยายด้วย JS Animation */
             transition: width 1.5s cubic-bezier(0.1, 1, 0.1, 1);
             position: relative;
         }
 
+        /* เอฟเฟกต์ไฟวิ่งในหลอด LED */
         .progress-bar::after {
             content: '';
             position: absolute;
@@ -263,7 +272,7 @@
                     <canvas id="overallChart"></canvas>
                     <div class="chart-center-text">
                         76%
-                        <span>In Progress</span>
+                        <span>Completed</span>
                     </div>
                 </div>
 
@@ -307,13 +316,13 @@
                 <div class="criteria-item c3">
                     <div class="criteria-header">
                         <div class="criteria-title">Criteria 3: Teaching and Learning Approach</div>
-                        <div class="criteria-badge bg-c3">100% In Progress</div>
+                        <div class="criteria-badge bg-c3">100% Complete</div>
                     </div>
                     <div class="progress-track">
                         <div class="progress-bar bar-c3" data-progress="100%"></div>
                     </div>
                     <div class="stats-footer">
-                        <span>สถานะ: สร็จสิ้น</span>
+                        <span>สถานะ: กำลังดำเนินการ</span>
                         <span>6 / 6 งาน</span>
                     </div>
                 </div>
@@ -321,10 +330,10 @@
                 <div class="criteria-item c4">
                     <div class="criteria-header">
                         <div class="criteria-title">Criteria 4: Student Assessment</div>
-                        <div class="criteria-badge bg-c4">14.3% In Progress</div>
+                        <div class="criteria-badge bg-c4">14.3% Not Started</div>
                     </div>
                     <div class="progress-track">
-                        <div class="progress-bar bar-c4" data-progress="14.3%"></div>
+                        <div class="progress-bar bar-c4" data-progress="14.28%"></div>
                     </div>
                     <div class="stats-footer">
                         <span>สถานะ: กำลังดำเนินการ</span>
@@ -338,6 +347,7 @@
     </div>
 
     <script>
+        // 1. ระบบอนิเมชั่นความก้าวหน้าของแถบ LED
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const bars = document.querySelectorAll('.progress-bar');
@@ -347,8 +357,10 @@
             }, 300);
         });
 
+        // 2. การสร้างกราฟวงกลมแบบ Donut LED ด้วย Chart.js
         const ctx = document.getElementById('overallChart').getContext('2d');
         
+        // สร้าง Gradient Color ให้กับตัวกราฟวงกลมเพื่อความล้ำ
         const neonGradient = ctx.createLinearGradient(0, 0, 0, 300);
         neonGradient.addColorStop(0, '#00f3ff');
         neonGradient.addColorStop(1, '#ff0055');
@@ -358,7 +370,7 @@
             data: {
                 labels: ['เสร็จสิ้น (Completed)', 'คงเหลือ (Remaining)'],
                 datasets: [{
-                    data:[19, 6],
+                    data: [19, 6], // 19 งานเสร็จ, 6 งานคงเหลือ
                     backgroundColor: [neonGradient, 'rgba(255, 255, 255, 0.05)'],
                     borderWidth: 0,
                     hoverOffset: 4
@@ -367,7 +379,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '83%',
+                cutout: '83%', // ความหนาของวงแหวน
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -382,6 +394,7 @@
             }
         });
 
+        // 3. เอฟเฟกต์ 3D Active Layer เมื่อขยับเมาส์ผ่านการ์ด (Parallax Effect)
         const cards = document.querySelectorAll('.card');
 
         cards.forEach(card => {
@@ -390,9 +403,11 @@
                 const cardWidth = cardRect.width;
                 const cardHeight = cardRect.height;
                 
+                // หาพิกัดเมาส์เทียบกับจุดกึ่งกลางของการ์ด
                 const mouseX = e.clientX - cardRect.left - cardWidth / 2;
                 const mouseY = e.clientY - cardRect.top - cardHeight / 2;
                 
+                // คำนวณองศาการหมุนบิด (ลิมิตไว้สูงสุดไม่เกิน 15 องศาเพื่อความนุ่มนวล)
                 const rotateX = -(mouseY / cardHeight) * 25;
                 const rotateY = (mouseX / cardWidth) * 25;
                 
@@ -400,6 +415,7 @@
                 card.style.boxShadow = `${-rotateY * 1.5}px ${rotateX * 1.5}px 30px rgba(0, 243, 255, 0.2), 0 20px 45px rgba(0,0,0,0.6)`;
             });
 
+            // เมื่อเมาส์ออก ให้การ์ดเด้งกลับคืนรูปเดิมแบบ Smooth
             card.addEventListener('mouseleave', () => {
                 card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
                 card.style.boxShadow = '0 20px 40px rgba(0,0,0,0.5)';
@@ -407,7 +423,7 @@
             });
 
             card.addEventListener('mouseenter', () => {
-                card.style.transition = 'none';
+                card.style.transition = 'none'; // ปิด transition ชั่วคราวเพื่อให้ตอบสนองเมาส์ทันทีขณะลาก
             });
         });
     </script>
